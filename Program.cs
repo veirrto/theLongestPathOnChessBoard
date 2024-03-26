@@ -137,7 +137,7 @@ class Chessboard
         return key;
     }
 
-    static int FindShortestPath()
+    static void FindShortestPath()
     {
 
         //definuj promenne a datove struktury
@@ -149,7 +149,12 @@ class Chessboard
 
         Queue<((int x, int y), int)> queue = new Queue<((int x, int y), int)>();
         Dictionary<(int x, int y), int> visited = new Dictionary<(int x, int y), int>();
+        Dictionary<(int x, int y), (int x, int y)> paths = new Dictionary<(int x, int y), (int x, int y)>();
         List<(int x, int y)> neighbours;
+        List<(int x, int y)> track = new List<(int x, int y)>(); 
+        
+
+
 
 
         queue.Enqueue((start, 0));
@@ -159,7 +164,6 @@ class Chessboard
         {
             (cell, depth) = queue.Dequeue();
 
-
             //add neighbours to queue
             neighbours = FindNeighbours(cell);
 
@@ -167,7 +171,11 @@ class Chessboard
             {
                 //je to lepsi, kdyz klic neni pole, ale string, string jako klic se lepe hleda ve slovniku
 
-                //pokud klic nebyl navstiven, pridame ho do fronty a do slovniku 
+                //pokud klic nebyl navstiven, pridame ho do fronty a do slovniku
+
+                
+
+
                 if (!visited.ContainsKey(cell))
                 {
                     visited.Add(cell, depth);
@@ -179,22 +187,48 @@ class Chessboard
                     visited.Add(neighbour, depth + 1);
                     queue.Enqueue((neighbour, depth + 1));
 
+                    paths.Add(neighbour, cell); 
+                   
                 }
                 //pokud klic se rovna cilovemu policku
 
                 if (neighbour.Equals(end))
                 {
                     //vratime hloubku policka, loop skonci 
-                    return visited[neighbour];
+                    //return visited[neighbour];
+                    queue.Clear();
+                    break; 
                 }
             }
         }
-        return pathNotFound;
+
+        
+        //vypis cestu 
+        if (paths.ContainsKey(end))
+        {
+            (int x, int y) temp = end;
+            track.Add(temp);
+            while (temp != start)
+            {
+                temp = paths[temp];
+                track.Add(temp);
+            }
+
+            for (int i = track.Count - 1; i > -1; i-- )
+            {
+                Console.WriteLine(track[i].x + " " + track[i].y); 
+            }
+        }
+        else
+        {
+            Console.WriteLine(pathNotFound);
+        }
+
+        //return pathNotFound;
     }
     static public void Main(String[] args)
     {
         InitializeUsersInput();
-        Console.WriteLine();
-        Console.WriteLine(FindShortestPath());
+        FindShortestPath(); 
     }
 }
